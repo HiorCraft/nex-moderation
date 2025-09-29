@@ -1,0 +1,11 @@
+mysql:
+  host: "localhost"
+  port: 3306
+  database: "moderation"
+  username: "root"
+  password: "password"
+
+messages:
+  ban: "&cDu wurdest gebannt! Grund: %reason%"
+  mute: "&cDu bist gemutet! Grund: %reason%"
+  warn: "&eDu wurdest verwarnt! Grund: %reason%"

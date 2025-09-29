@@ -2,7 +2,7 @@ package de.hiorcraft.nex.nexmoderation
 
 import org.bukkit.plugin.java.JavaPlugin
 
-class Nexmoderation : JavaPlugin() {
+class NexModeration : JavaPlugin() {
 
     override fun onEnable() {
         // Plugin startup logic

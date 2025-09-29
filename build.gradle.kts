@@ -1,47 +1,68 @@
+import net.minecrell.pluginyml.paper.PaperPluginDescription
+
 plugins {
-    kotlin("jvm") version "2.2.20"
-    id("com.gradleup.shadow") version "8.3.0"
+    java
+    id("de.eldoria.plugin-yml.paper") version "0.7.1"
     id("xyz.jpenilla.run-paper") version "2.3.1"
+    id("com.gradleup.shadow") version "9.0.0-beta12"
 }
 
-group = "de.hiorcraft.nex"
-version = "1.0"
+group = "de.hiorcraft"
+version = "1.0.0"
 
 repositories {
     mavenCentral()
-    maven("https://repo.papermc.io/repository/maven-public/") {
+    maven {
         name = "papermc-repo"
+        url = uri("https://repo.papermc.io/repository/maven-public/")
+    }
+    maven {
+        url = uri("https://repo.codemc.org/repository/maven-public/")
+    }
+    maven {
+        url = uri("https://repo.codemc.io/repository/maven-releases/")
+    }
+    maven {
+        url = uri("https://repo.codemc.io/repository/maven-snapshots/")
     }
 }
 
 dependencies {
     compileOnly("io.papermc.paper:paper-api:1.21.7-R0.1-SNAPSHOT")
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+    compileOnly("dev.jorel:commandapi-bukkit-core:10.1.1")
+
+    // DB
+    implementation("com.zaxxer:HikariCP:5.1.0")
+    implementation("mysql:mysql-connector-java:8.0.33")
+
+}
+
+paper {
+    main = "de.HiorCraft.nex.NexModeration"
+    name = "NexModeration"
+    apiVersion = "1.21"
+
+    serverDependencies {
+        register("CommandAPI") {
+            required = true
+            load = PaperPluginDescription.RelativeLoadOrder.BEFORE
+        }
+    }
 }
 
 tasks {
     runServer {
-        // Configure the Minecraft version for our task.
-        // This is the only required configuration besides applying the plugin.
-        // Your plugin's jar (or shadowJar if present) will be used automatically.
-        minecraftVersion("1.21")
+        minecraftVersion("1.21.7")
+
+        downloadPlugins {
+            hangar("commandapi", "10.1.1")
+        }
     }
 }
 
-val targetJavaVersion = 21
-kotlin {
-    jvmToolchain(targetJavaVersion)
-}
 
-tasks.build {
-    dependsOn("shadowJar")
-}
-
-tasks.processResources {
-    val props = mapOf("version" to version)
-    inputs.properties(props)
-    filteringCharset = "UTF-8"
-    filesMatching("plugin.yml") {
-        expand(props)
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(21))
     }
 }
