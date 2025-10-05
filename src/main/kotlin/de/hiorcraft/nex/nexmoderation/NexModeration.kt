@@ -1,6 +1,11 @@
 package de.hiorcraft.nex.nexmoderation
 
 import org.bukkit.plugin.java.JavaPlugin
+import de.hiorcraft.nex.nexmoderation.punishment.PunishmentManager
+import de.hiorcraft.nex.nexmoderation.commands.BanCommand
+import de.hiorcraft.nex.nexmoderation.punishment.PunishmentType
+import de.hiorcraft.nex.nexmoderation.punishment.Punishment
+import  de.hiorcraft.nex.nexmoderation.punishment.PunishmentManager
 
 class NexModeration : JavaPlugin() {
 
@@ -14,17 +19,7 @@ class NexModeration : JavaPlugin() {
 
 
     override fun onEnable() {
-        logger.info("NexModeration Starting...")
         instance = this
-        saveDefaultConfig()
-
-        setupDatabase()
-        punishmentManager = PunishmentManager(dataSourece)
-
-        // Comand registration
-        BanCommand(punishmentManager).register()
-        MuteCommand(punishmentManager).register()
-        WarnCommand(punishmentManager).register()
 
 
         logger.info("NexModeration enabled")
@@ -43,6 +38,7 @@ class NexModeration : JavaPlugin() {
 
     override fun onDisable() {
         logger.info("NexModeration disabled")
+
 
         logger.info("Bye <3")
     }

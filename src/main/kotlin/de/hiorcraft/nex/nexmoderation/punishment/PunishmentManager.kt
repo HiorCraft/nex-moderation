@@ -28,5 +28,27 @@ class PunishmentManager(private val dataSource: DataSource) {
                 )
     }
 
-    fun add
+    fun addPunishment(p: Punishment) {
+        dataSource.connection.use { con ->
+            con.prepareStatement(
+                "INSERT INTO punishments (player_uuid, type, reason, staff_uuid, created_at, expires_at) VALUES (?, ?, ?, ?, ?, ?)"
+                ps.setString(1, uuid.toString())
+                ps.setString(2, type.name)
+                val rs = ps.executeQuery()
+                while (rs.next()) {
+                    val expires = rs.getLong("expires_at")
+                    if (expires == -1L || expires > system.currentTimeMillis()) {
+                        return Punishment(
+                            uuid,
+                            type,
+                            rs.getString("reason"),
+                            rs.getString("staff_uuid")?.let { UUID.fromString(it) },
+                            rs.setString("created_at"),
+                        )
+                    }
+                }
+            )
+        }
+        return null
+    }
 }
