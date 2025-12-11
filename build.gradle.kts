@@ -1,68 +1,28 @@
-import net.minecrell.pluginyml.paper.PaperPluginDescription
+import dev.slne.surf.surfapi.gradle.util.withSurfApiBukkit
 
 plugins {
-    java
-    id("de.eldoria.plugin-yml.paper") version "0.7.1"
-    id("xyz.jpenilla.run-paper") version "2.3.1"
-    id("com.gradleup.shadow") version "9.0.0-beta12"
-}
-
-group = "de.hiorcraft"
-version = "1.0.0"
-
-repositories {
-    mavenCentral()
-    maven {
-        name = "papermc-repo"
-        url = uri("https://repo.papermc.io/repository/maven-public/")
-    }
-    maven {
-        url = uri("https://repo.codemc.org/repository/maven-public/")
-    }
-    maven {
-        url = uri("https://repo.codemc.io/repository/maven-releases/")
-    }
-    maven {
-        url = uri("https://repo.codemc.io/repository/maven-snapshots/")
-    }
+    id("dev.slne.surf.surfapi.gradle.paper-plugin")
 }
 
 dependencies {
-    compileOnly("io.papermc.paper:paper-api:1.21.7-R0.1-SNAPSHOT")
-    compileOnly("dev.jorel:commandapi-bukkit-core:10.1.1")
-
-    // DB
-    implementation("com.zaxxer:HikariCP:5.1.0")
-    implementation("mysql:mysql-connector-java:8.0.33")
-
+    api("dev.slne.surf:surf-database:2.2.1-SNAPSHOT")
 }
 
-paper {
-    main = "de.HiorCraft.nex.NexModeration"
-    name = "NexModeration"
-    apiVersion = "1.21"
+group = "de.hiorcraft.nex"
+version = findProperty("version") as String
 
-    serverDependencies {
-        register("CommandAPI") {
-            required = true
-            load = PaperPluginDescription.RelativeLoadOrder.BEFORE
-        }
-    }
-}
+surfPaperPluginApi {
+    mainClass("de.hiorcraft.nex.nexmoderation.NexModeration")
+    generateLibraryLoader(false)
+    authors.add("HiorCraft")
 
-tasks {
     runServer {
-        minecraftVersion("1.21.7")
-
-        downloadPlugins {
-            hangar("commandapi", "10.1.1")
-        }
+        withSurfApiBukkit()
     }
 }
-
 
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(21))
+        languageVersion.set(JavaLanguageVersion.of(24))
     }
 }

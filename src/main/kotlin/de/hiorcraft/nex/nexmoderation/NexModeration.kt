@@ -1,45 +1,49 @@
 package de.hiorcraft.nex.nexmoderation
 
-import org.bukkit.plugin.java.JavaPlugin
-import de.hiorcraft.nex.nexmoderation.punishment.PunishmentManager
-import de.hiorcraft.nex.nexmoderation.commands.BanCommand
-import de.hiorcraft.nex.nexmoderation.punishment.PunishmentType
+import com.github.shynixn.mccoroutine.folia.SuspendingJavaPlugin
+import com.github.shynixn.mccoroutine.folia.launch
+import de.hiorcraft.nex.nexmoderation.database.PunishmentManager
 import de.hiorcraft.nex.nexmoderation.punishment.Punishment
-import  de.hiorcraft.nex.nexmoderation.punishment.PunishmentManager
+import de.hiorcraft.nex.nexmoderation.punishment.PunishmentType
+import net.kyori.adventure.text.Component
+import org.bukkit.Bukkit
+import org.bukkit.plugin.java.JavaPlugin
+
+val plugin get() = JavaPlugin.getPlugin(NexModeration::class.java)
 
 class NexModeration : JavaPlugin() {
 
-    companion object{
-        lateinit var instance: NexModeration
-            private set
+    override fun onLoad() {
+        PunishmentManager.connect(dataFolder.toPath())
+        PunishmentManager.createTables()
     }
-
-    lateinit var dataSourece: DataSource
-    lateinit var punishmentManager: PunishmentManager
-
 
     override fun onEnable() {
-        instance = this
+        logger.info("NexModeratio  ist starting.....")
+        val test = Punishment(
+            Bukkit.getOfflinePlayer("Hiorcraft").uniqueId,
+            PunishmentType.BAN,
+            "Testing",
+            Bukkit.getOfflinePlayer("Hiorcraft").uniqueId,
+            System.currentTimeMillis(),
+            -1L
+        )
 
+        plugin.launch {
+            PunishmentManager.savePunishment(test)
 
-        logger.info("NexModeration enabled")
-    }
-
-    private fun setupDatabase() {
-        val cfg = HikariConfig().apply {
-            jdcUrl = "jdbc:mysql://${getConfig().getString("database.host")}:${getConfig().getInt("database.port")}/${getConfig().getString("database.name")}"
-            username = getConfig().getString("database.user")
-            password = getConfig().getString("database.password")
-
-           }
-        dataSourece = HikariDataSource(cfg)
+            val data = PunishmentManager.loadPunishments()
+            for (punishment in data) {
+                punishment.player
+                Bukkit.broadcast(Component.text("${punishment.player}"))
+            }
         }
+        logger.info("NexModeration is started")
     }
 
     override fun onDisable() {
         logger.info("NexModeration disabled")
-
-
+        PunishmentManager.disconnect()
         logger.info("Bye <3")
     }
 }
