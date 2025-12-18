@@ -3,15 +3,14 @@ package de.hiorcraft.nex.nexmoderation
 import com.github.shynixn.mccoroutine.folia.SuspendingJavaPlugin
 import com.github.shynixn.mccoroutine.folia.launch
 import de.hiorcraft.nex.nexmoderation.database.PunishmentManager
-import de.hiorcraft.nex.nexmoderation.punishment.Punishment
-import de.hiorcraft.nex.nexmoderation.punishment.PunishmentType
+import de.hiorcraft.nex.nexmoderation.util.CommandManager
 import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
 import org.bukkit.plugin.java.JavaPlugin
 
 val plugin get() = JavaPlugin.getPlugin(NexModeration::class.java)
 
-class NexModeration : JavaPlugin() {
+class NexModeration : SuspendingJavaPlugin() {
 
     override fun onLoad() {
         PunishmentManager.connect(dataFolder.toPath())
@@ -20,17 +19,13 @@ class NexModeration : JavaPlugin() {
 
     override fun onEnable() {
         logger.info("NexModeratio  ist starting.....")
-        val test = Punishment(
-            Bukkit.getOfflinePlayer("Hiorcraft").uniqueId,
-            PunishmentType.BAN,
-            "Testing",
-            Bukkit.getOfflinePlayer("Hiorcraft").uniqueId,
-            System.currentTimeMillis(),
-            -1L
-        )
+
+        val manager = server.pluginManager
+
+        CommandManager.registerAll(plugin)
+
 
         plugin.launch {
-            PunishmentManager.savePunishment(test)
 
             val data = PunishmentManager.loadPunishments()
             for (punishment in data) {
